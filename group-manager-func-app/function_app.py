@@ -42,12 +42,12 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.function_name(name="TestAzureConnection")
 @app.route(route="azure/test", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
-def test_azure_connection(req: func.HttpRequest) -> func.HttpResponse:
+async def test_azure_connection(req: func.HttpRequest) -> func.HttpResponse:
     """Test Azure AD connection"""
     logger.info('Azure connection test requested')
     
     try:
-        result = graph_service.test_connection()
+        result = await graph_service.test_connection()
         
         return func.HttpResponse(
             json.dumps(result),
@@ -68,7 +68,7 @@ def test_azure_connection(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.function_name(name="SearchGroups")
 @app.route(route="groups/search", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
-def search_groups(req: func.HttpRequest) -> func.HttpResponse:
+async def search_groups(req: func.HttpRequest) -> func.HttpResponse:
     """
     Search/List Azure AD groups
     Query params:
@@ -83,7 +83,7 @@ def search_groups(req: func.HttpRequest) -> func.HttpResponse:
         top = int(req.params.get('top', 100))
         
         # Search groups using Graph API
-        groups = graph_service.search_groups(search_term, top)
+        groups = await graph_service.search_groups(search_term, top)
         
         return func.HttpResponse(
             json.dumps({
@@ -108,7 +108,7 @@ def search_groups(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.function_name(name="GetGroupMembers")
 @app.route(route="groups/{groupId}/members", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
-def get_group_members(req: func.HttpRequest) -> func.HttpResponse:
+async def get_group_members(req: func.HttpRequest) -> func.HttpResponse:
     """
     Get members of a specific Azure AD group
     Path param: groupId (GUID)
@@ -127,7 +127,7 @@ def get_group_members(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         # Get group members from Graph API
-        members = graph_service.get_group_members(group_id)
+        members = await graph_service.get_group_members(group_id)
         
         return func.HttpResponse(
             json.dumps({
@@ -153,7 +153,7 @@ def get_group_members(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.function_name(name="CreateGroup")
 @app.route(route="groups", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
-def create_group(req: func.HttpRequest) -> func.HttpResponse:
+async def create_group(req: func.HttpRequest) -> func.HttpResponse:
     """
     Create a new Azure AD group
     Request body:
@@ -217,7 +217,7 @@ def create_group(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         # Create group using Graph API
-        created_group = graph_service.create_group(name, description, group_type)
+        created_group = await graph_service.create_group(name, description, group_type)
         
         return func.HttpResponse(
             json.dumps({

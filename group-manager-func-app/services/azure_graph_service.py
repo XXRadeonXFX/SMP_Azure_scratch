@@ -43,14 +43,14 @@ class AzureGraphService:
             )
         return self._graph_client
     
-    def test_connection(self) -> Dict[str, Any]:
+    async def test_connection(self) -> Dict[str, Any]:
         """Test Azure AD connection"""
         try:
             logger.info("Testing Azure AD connection")
             client = self._get_graph_client()
             
-            # Try to get organization info
-            org_result = client.organization.get()
+            # Try to get organization info - MUST await the async call
+            org_result = await client.organization.get()
             
             if org_result and org_result.value and len(org_result.value) > 0:
                 org_info = org_result.value[0]
@@ -75,7 +75,7 @@ class AzureGraphService:
                 "message": "Failed to connect to Azure AD"
             }
     
-    def search_groups(self, search_term: str = "", top: int = 100) -> List[Dict[str, Any]]:
+    async def search_groups(self, search_term: str = "", top: int = 100) -> List[Dict[str, Any]]:
         """
         Search Azure AD groups
         
@@ -90,25 +90,32 @@ class AzureGraphService:
             logger.info(f"Searching groups with term: '{search_term}', top: {top}")
             client = self._get_graph_client()
             
-            # Build query
+            # Build query configuration
+            from msgraph.generated.groups.groups_request_builder import GroupsRequestBuilder
+            
             if search_term:
                 # Filter by display name containing search term
                 filter_query = f"startswith(displayName, '{search_term}')"
-                result = client.groups.get(
-                    request_configuration=lambda config: (
-                        setattr(config.query_parameters, 'filter', filter_query),
-                        setattr(config.query_parameters, 'top', top),
-                        setattr(config.query_parameters, 'select', ['id', 'displayName', 'description', 'mailEnabled', 'securityEnabled'])
-                    )
+                
+                query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
+                    filter=filter_query,
+                    top=top,
+                    select=['id', 'displayName', 'description', 'mailEnabled', 'securityEnabled']
                 )
+                request_config = GroupsRequestBuilder.GroupsRequestBuilderGetRequestConfiguration(
+                    query_parameters=query_params
+                )
+                result = await client.groups.get(request_configuration=request_config)
             else:
                 # Get all groups (up to top limit)
-                result = client.groups.get(
-                    request_configuration=lambda config: (
-                        setattr(config.query_parameters, 'top', top),
-                        setattr(config.query_parameters, 'select', ['id', 'displayName', 'description', 'mailEnabled', 'securityEnabled'])
-                    )
+                query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
+                    top=top,
+                    select=['id', 'displayName', 'description', 'mailEnabled', 'securityEnabled']
                 )
+                request_config = GroupsRequestBuilder.GroupsRequestBuilderGetRequestConfiguration(
+                    query_parameters=query_params
+                )
+                result = await client.groups.get(request_configuration=request_config)
             
             groups = []
             if result and result.value:
@@ -128,7 +135,7 @@ class AzureGraphService:
             logger.error(f"Search groups failed: {str(e)}")
             raise Exception(f"Failed to search groups: {str(e)}")
     
-    def get_group_members(self, group_id: str) -> List[Dict[str, Any]]:
+    async def get_group_members(self, group_id: str) -> List[Dict[str, Any]]:
         """
         Get members of a specific group
         
@@ -142,8 +149,8 @@ class AzureGraphService:
             logger.info(f"Getting members for group: {group_id}")
             client = self._get_graph_client()
             
-            # Get group members
-            result = client.groups.by_group_id(group_id).members.get()
+            # Get group members - MUST await the async call
+            result = await client.groups.by_group_id(group_id).members.get()
             
             members = []
             if result and result.value:
@@ -167,7 +174,7 @@ class AzureGraphService:
             logger.error(f"Get group members failed: {str(e)}")
             raise Exception(f"Failed to get group members: {str(e)}")
     
-    def create_group(self, name: str, description: str, group_type: str) -> Dict[str, Any]:
+    async def create_group(self, name: str, description: str, group_type: str) -> Dict[str, Any]:
         """
         Create a new Azure AD group
         
@@ -183,14 +190,17 @@ class AzureGraphService:
             logger.info(f"Creating group: {name}, type: {group_type}")
             client = self._get_graph_client()
             
-            # Check if group already exists
-            existing = client.groups.get(
-                request_configuration=lambda config: setattr(
-                    config.query_parameters, 
-                    'filter', 
-                    f"displayName eq '{name}'"
-                )
+            # Check if group already exists - MUST await the async call
+            from msgraph.generated.groups.groups_request_builder import GroupsRequestBuilder
+            
+            filter_query = f"displayName eq '{name}'"
+            query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
+                filter=filter_query
             )
+            request_config = GroupsRequestBuilder.GroupsRequestBuilderGetRequestConfiguration(
+                query_parameters=query_params
+            )
+            existing = await client.groups.get(request_configuration=request_config)
             
             if existing and existing.value and len(existing.value) > 0:
                 raise ValueError(f"Group '{name}' already exists")
@@ -210,8 +220,8 @@ class AzureGraphService:
                 new_group.group_types = ["Unified"]
                 new_group.visibility = "Public"
             
-            # Create the group
-            created_group = client.groups.post(new_group)
+            # Create the group - MUST await the async call
+            created_group = await client.groups.post(new_group)
             
             logger.info(f"Group created successfully: {created_group.id}")
             
