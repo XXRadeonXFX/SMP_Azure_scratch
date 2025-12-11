@@ -1,0 +1,23 @@
+# 1. Health Check (no auth)
+curl http://localhost:7071/api/health
+
+# 2. Azure Connection Test
+curl http://localhost:7071/api/azure/test
+
+# 3. Search All Groups
+curl http://localhost:7071/api/groups/search
+
+# 4. Search Groups (filtered)
+curl "http://localhost:7071/api/groups/search?search=AAD&top=10"
+
+# 5. Get Group Members (replace GROUP_ID)
+curl http://localhost:7071/api/groups/YOUR_GROUP_ID/members
+
+# 6. Create Group
+curl -X POST http://localhost:7071/api/groups \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "AAD.TA.TEST.GROUP",
+    "description": "Test Group",
+    "type": "Security"
+  }'
