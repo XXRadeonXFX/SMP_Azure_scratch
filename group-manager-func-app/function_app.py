@@ -245,3 +245,36 @@ async def create_group(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500
         )
+@app.function_name(name="AddGroupMember")
+@app.route(route="groups/{groupId}/members", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+async def add_group_member(req: func.HttpRequest) -> func.HttpResponse:
+    """Add a member to a group"""
+    logger.info('Add group member requested')
+    
+    try:
+        group_id = req.route_params.get('groupId')
+        req_body = req.get_json()
+        user_id = req_body.get('userId')
+        
+        if not group_id or not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "groupId and userId are required"}),
+                mimetype="application/json",
+                status_code=400
+            )
+        
+        result = await graph_service.add_group_member(group_id, user_id)
+        
+        return func.HttpResponse(
+            json.dumps(result),
+            mimetype="application/json",
+            status_code=201
+        )
+        
+    except Exception as e:
+        logger.error(f"Add member failed: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )

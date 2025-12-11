@@ -239,3 +239,29 @@ class AzureGraphService:
         except Exception as e:
             logger.error(f"Create group failed: {str(e)}")
             raise Exception(f"Failed to create group: {str(e)}")
+
+    async def add_group_member(self, group_id: str, user_id: str) -> Dict[str, Any]:
+        """Add a member to a group"""
+        try:
+            logger.info(f"Adding user {user_id} to group {group_id}")
+            client = self._get_graph_client()
+            
+            # Create reference to user
+            from msgraph.generated.models.reference_create import ReferenceCreate
+            
+            reference = ReferenceCreate()
+            reference.odata_id = f"https://graph.microsoft.com/v1.0/directoryObjects/{user_id}"
+            
+            # Add member to group
+            await client.groups.by_group_id(group_id).members.ref.post(reference)
+            
+            logger.info(f"Successfully added user {user_id} to group {group_id}")
+            return {
+                "message": "Member added successfully",
+                "groupId": group_id,
+                "userId": user_id
+            }
+            
+        except Exception as e:
+            logger.error(f"Add member failed: {str(e)}")
+            raise Exception(f"Failed to add member: {str(e)}")
