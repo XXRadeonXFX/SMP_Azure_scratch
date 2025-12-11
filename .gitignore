@@ -1,1 +1,214 @@
+# ========================================
+# Azure Functions Python Project .gitignore
+# ========================================
+
+# ============================================================
+# CRITICAL: Azure Functions Local Settings (Contains Secrets!)
+# ============================================================
+local.settings.json
+*.local.settings.json
+
+# ============================================================
+# Environment Variables & Secrets
+# ============================================================
 .env
+.env.*
+*.env
+.env.local
+.env.development
+.env.production
+secrets.json
+appsettings.json
+appsettings.*.json
+
+# ============================================================
+# Azure Functions Specific
+# ============================================================
+bin/
+obj/
+.python_packages/
+.venv/
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json
+.azurite/
+
+# ============================================================
+# Python
+# ============================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+pythonenv*
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Pyre type checker
+.pyre/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================================
+# IDEs & Editors
+# ============================================================
+# VSCode
+.vscode/
+*.code-workspace
+.history/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# ============================================================
+# Operating System Files
+# ============================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================================
+# Logs & Databases
+# ============================================================
+*.log
+*.sql
+*.sqlite
+*.db
+
+# ============================================================
+# Temporary Files
+# ============================================================
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Archives
+# ============================================================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ============================================================
+# Docker (if you use it later)
+# ============================================================
+# docker-compose.override.yml
+
+# ============================================================
+# Azure Storage Emulator
+# ============================================================
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json
+
+# ============================================================
+# Node modules (if you add any Node.js tooling)
+# ============================================================
+node_modules/
+package-lock.json
+yarn.lock
+
+# ============================================================
+# Terraform (if you use it for infrastructure)
+# ============================================================
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# ============================================================
+# Custom
+# ============================================================
+# Add any project-specific files here
+scratch/
+notes.txt
+TODO.md
