@@ -1,0 +1,9 @@
+# Azure Functions
+azure-functions==1.18.0
+
+# Azure SDK
+azure-identity==1.15.0
+msgraph-sdk==1.0.0
+
+# Utilities
+python-dateutil==2.8.2
